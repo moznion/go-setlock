@@ -60,7 +60,7 @@ func main() {
 
 func parseOpt() (bool, bool) {
 	var n, N, x, X bool
-	flag.BoolVar(&n, "n", false, "No delay. If fn is locked by another process, setlock gives up (windows doesn't support this).")
+	flag.BoolVar(&n, "n", false, "No delay. If fn is locked by another process, setlock gives up.")
 	flag.BoolVar(&N, "N", false, "(Default.) Delay. If fn is locked by another process, setlock waits until it can obtain a new lock.")
 	flag.BoolVar(&x, "x", false, "If fn cannot be opened (or created) or locked, setlock exits zero.")
 	flag.BoolVar(&X, "X", false, "(Default.) If fn cannot be opened (or created) or locked, setlock prints an error message and exits nonzero.")
