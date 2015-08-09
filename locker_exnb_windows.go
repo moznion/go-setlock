@@ -1,10 +1,6 @@
 package main
 
-import (
-	"errors"
-	"fmt"
-	"os"
-)
+import "os"
 
 type lockerEXNB struct {
 }
@@ -14,7 +10,10 @@ func newLockerEXNB() *lockerEXNB {
 }
 
 func (l *lockerEXNB) lock(file *os.File) error {
-	msg := "setlock: fatal: windows doesn't support no delay mode"
-	fmt.Fprintf(os.Stderr, "%s\n", msg)
-	return errors.New(msg)
+	file.Close() // Not use already opened file
+	fm, err := makeFileMutex(file.Name())
+	if err != nil {
+		return err
+	}
+	return fm.locknb()
 }

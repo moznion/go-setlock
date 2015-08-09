@@ -1,11 +1,6 @@
 package main
 
-import (
-	"errors"
-	"os"
-	"syscall"
-	"time"
-)
+import "os"
 
 type lockerEX struct {
 }
@@ -15,25 +10,10 @@ func newLockerEX() *lockerEX {
 }
 
 func (l *lockerEX) lock(file *os.File) error {
-	h, err := syscall.LoadLibrary("kernel32.dll")
+	file.Close() // Not use already opened file
+	fm, err := makeFileMutex(file.Name())
 	if err != nil {
 		return err
 	}
-	defer syscall.FreeLibrary(h)
-
-	addr, err := syscall.GetProcAddress(h, "LockFile")
-	if err != nil {
-		return err
-	}
-	for {
-		r0, _, err := syscall.Syscall6(addr, 5, file.Fd(), 0, 0, 0, 1, 0)
-		if err != 0 {
-			return errors.New(err.Error())
-		}
-		if 0 != int(r0) {
-			break
-		}
-		time.Sleep(100 * time.Millisecond)
-	}
-	return nil
+	return fm.lockb()
 }
