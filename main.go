@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"syscall"
 )
 
 func main() {
@@ -19,14 +18,6 @@ func main() {
 	}
 
 	filePath := argv[0]
-	file, err := os.OpenFile(filePath, syscall.O_RDONLY|syscall.O_NONBLOCK|syscall.O_APPEND|syscall.O_CREAT, 0600) // open append
-	if err != nil {
-		if flagx {
-			os.Exit(0)
-		}
-		fmt.Fprintf(os.Stderr, "setlock: fatal: unable to open %s: temporary failure\n", filePath)
-		os.Exit(111)
-	}
 
 	var locker locker
 	if flagndelay {
@@ -34,12 +25,12 @@ func main() {
 	} else {
 		locker = newLockerEX()
 	}
-	err = locker.lock(file)
+	err := locker.lock(filePath)
 	if err != nil {
 		if flagx {
 			os.Exit(0)
 		}
-		fmt.Fprintf(os.Stderr, "setlock: fatal: unable to lock %s: temporary failure\n", filePath)
+		fmt.Println(err)
 		os.Exit(111)
 	}
 

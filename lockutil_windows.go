@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 	"syscall"
 	"unsafe"
@@ -18,41 +19,40 @@ var (
 	procLockFileEx = modkernel32.NewProc("LockFileEx")
 )
 
+func (l *lockerEX) lockb(lockfilename string) error {
+	return lock(lockfilename, LOCKFILE_EXCLUSIVE_LOCK)
+}
+
+func (l *lockerEXNB) locknb(lockfilename string) error {
+	return lock(lockfilename, LOCKFILE_EXCLUSIVE_LOCK|LOCKFILE_FAIL_IMMEDIATELY)
+}
+
 type fileMutex struct {
 	mu sync.RWMutex
 	fd syscall.Handle
 }
 
-func makeFileMutex(filename string) (*fileMutex, error) {
-	if filename == "" {
-		return &fileMutex{fd: INVALID_FILE_HANDLE}, errors.New("Filename must not be empty")
+func lock(lockfilename string, flags uint32) error {
+	if lockfilename == "" {
+		return errors.New("setlock: fatal: unable to open: filaname must not be empty")
 	}
-	fd, err := syscall.CreateFile(&(syscall.StringToUTF16(filename)[0]), syscall.GENERIC_READ|syscall.GENERIC_WRITE,
+	fd, err := syscall.CreateFile(&(syscall.StringToUTF16(lockfilename)[0]), syscall.GENERIC_READ|syscall.GENERIC_WRITE,
 		syscall.FILE_SHARE_READ|syscall.FILE_SHARE_WRITE, nil, syscall.OPEN_ALWAYS, syscall.FILE_ATTRIBUTE_NORMAL, 0)
 	if err != nil {
-		return nil, err
+		return fmt.Errorf("setlock: fatal: unable to open %s: temporary failure", lockfilename)
 	}
-	return &fileMutex{fd: fd}, nil
-}
 
-func (m *fileMutex) lockb() error {
-	return m.lock(LOCKFILE_EXCLUSIVE_LOCK)
-}
+	m := &fileMutex{fd: fd}
 
-func (m *fileMutex) locknb() error {
-	return m.lock(LOCKFILE_EXCLUSIVE_LOCK | LOCKFILE_FAIL_IMMEDIATELY)
-}
-
-func (m *fileMutex) lock(flags uint32) error {
+	unnableLockErr := fmt.Errorf("setlock: fatal: unable to lock %s: temporary failure", lockfilename)
 	if m.fd == INVALID_FILE_HANDLE {
-		return errors.New("Invalid file handle")
+		return unnableLockErr
 	}
-
-	m.mu.Lock()
 
 	var ol syscall.Overlapped
+	m.mu.Lock()
 	if err := lockFileEx(m.fd, flags, 0, 1, 0, &ol); err != nil {
-		return err
+		return unnableLockErr
 	}
 	return nil
 }
