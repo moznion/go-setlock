@@ -19,7 +19,7 @@ func main() {
 	}
 
 	filePath := argv[0]
-	file, err := os.OpenFile(filePath, syscall.O_WRONLY|syscall.O_NONBLOCK|syscall.O_APPEND|syscall.O_CREAT, 0600) // open append
+	file, err := os.OpenFile(filePath, syscall.O_RDONLY|syscall.O_NONBLOCK|syscall.O_APPEND|syscall.O_CREAT, 0600) // open append
 	if err != nil {
 		if flagx {
 			os.Exit(0)
