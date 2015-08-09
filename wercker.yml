@@ -1,4 +1,4 @@
-box: motemen/golang-goxc
+box: etcinit/golang-goxc@0.2.3
 build:
   steps:
     - setup-go-workspace
