@@ -7,13 +7,22 @@ import (
 	"os/exec"
 )
 
+const (
+	VERSION = "1.0.0"
+)
+
 func main() {
-	flagndelay, flagx := parseOpt()
+	flagndelay, flagx, showVer := parseOpt()
 	argv := flag.Args()
+
+	if showVer {
+		fmt.Printf("%s\n", VERSION)
+		os.Exit(0)
+	}
 
 	if len(argv) < 2 {
 		// show usage
-		fmt.Fprintf(os.Stderr, "setlock: usage: setlock [ -nNxX ] file program [ arg ... ]\n")
+		fmt.Fprintf(os.Stderr, "setlock: usage: setlock [ -nNxXv ] file program [ arg ... ]\n")
 		os.Exit(100)
 	}
 
@@ -49,16 +58,17 @@ func main() {
 	}
 }
 
-func parseOpt() (bool, bool) {
-	var n, N, x, X bool
+func parseOpt() (bool, bool, bool) {
+	var n, N, x, X, showVer bool
 	flag.BoolVar(&n, "n", false, "No delay. If fn is locked by another process, setlock gives up.")
 	flag.BoolVar(&N, "N", false, "(Default.) Delay. If fn is locked by another process, setlock waits until it can obtain a new lock.")
 	flag.BoolVar(&x, "x", false, "If fn cannot be opened (or created) or locked, setlock exits zero.")
 	flag.BoolVar(&X, "X", false, "(Default.) If fn cannot be opened (or created) or locked, setlock prints an error message and exits nonzero.")
+	flag.BoolVar(&showVer, "v", false, "Show version.")
 	flag.Parse()
 
 	flagndelay := n && !N
 	flagx := x && !X
 
-	return flagndelay, flagx
+	return flagndelay, flagx, showVer
 }
