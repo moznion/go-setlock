@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"sync"
 	"syscall"
 	"unsafe"
@@ -24,7 +25,7 @@ type fileMutex struct {
 
 func makeFileMutex(filename string) (*fileMutex, error) {
 	if filename == "" {
-		return &fileMutex{fd: INVALID_FILE_HANDLE}
+		return &fileMutex{fd: INVALID_FILE_HANDLE}, errors.New("Filename must not be empty")
 	}
 	fd, err := syscall.CreateFile(&(syscall.StringToUTF16(filename)[0]), syscall.GENERIC_READ|syscall.GENERIC_WRITE,
 		syscall.FILE_SHARE_READ|syscall.FILE_SHARE_WRITE, nil, syscall.OPEN_ALWAYS, syscall.FILE_ATTRIBUTE_NORMAL, 0)
@@ -43,12 +44,15 @@ func (m *fileMutex) locknb() error {
 }
 
 func (m *fileMutex) lock(flags uint32) error {
+	if m.fd == INVALID_FILE_HANDLE {
+		return errors.New("Invalid file handle")
+	}
+
 	m.mu.Lock()
-	if m.fd != INVALID_FILE_HANDLE {
-		var ol syscall.Overlapped
-		if err := lockFileEx(m.fd, flags, 0, 1, 0, &ol); err != nil {
-			return err
-		}
+
+	var ol syscall.Overlapped
+	if err := lockFileEx(m.fd, flags, 0, 1, 0, &ol); err != nil {
+		return err
 	}
 	return nil
 }
