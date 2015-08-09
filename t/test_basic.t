@@ -76,7 +76,7 @@ subtest 'overwrite with negative option' => sub {
 
     if ($pid == 0) {
         # child process
-        `./$bin $lockfile sleep 7`;
+        `./$bin $lockfile sleep 5`;
         exit;
     }
 
@@ -88,7 +88,7 @@ subtest 'overwrite with negative option' => sub {
     my $end = time;
 
     is $status, 0, 'Execute command successfully';
-    ok $end - $begin > 4, 'Block rightly'; # XXX aggressive!
+    ok $end - $begin > 3, 'Block rightly'; # XXX aggressive!
 };
 
 unlink $lockfile;
