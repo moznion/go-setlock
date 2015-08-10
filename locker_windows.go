@@ -20,17 +20,19 @@ var (
 
 type locker struct {
 	nonblock bool
+	filename string
 	fd       syscall.Handle
 }
 
-func NewLocker(nonblock bool) *locker {
+func NewLocker(filename string, nonblock bool) *locker {
 	return &locker{
 		nonblock: nonblock,
+		filename: filename,
 		fd:       INVALID_FILE_HANDLE,
 	}
 }
 
-func (l *locker) Lock(lockfilename string) error {
+func (l *locker) Lock() error {
 	if l.fd != INVALID_FILE_HANDLE {
 		return ErrFailedToAcquireLock
 	}
@@ -42,13 +44,13 @@ func (l *locker) Lock(lockfilename string) error {
 		flags = LOCKFILE_EXCLUSIVE_LOCK
 	}
 
-	if lockfilename == "" {
+	if l.filename == "" {
 		return ErrLockFileEmpty
 	}
-	fd, err := syscall.CreateFile(&(syscall.StringToUTF16(lockfilename)[0]), syscall.GENERIC_READ|syscall.GENERIC_WRITE,
+	fd, err := syscall.CreateFile(&(syscall.StringToUTF16(l.filename)[0]), syscall.GENERIC_READ|syscall.GENERIC_WRITE,
 		syscall.FILE_SHARE_READ|syscall.FILE_SHARE_WRITE, nil, syscall.OPEN_ALWAYS, syscall.FILE_ATTRIBUTE_NORMAL, 0)
 	if err != nil {
-		return fmt.Errorf("setlock: fatal: unable to open %s: temporary failure", lockfilename)
+		return fmt.Errorf("setlock: fatal: unable to open %s: temporary failure", l.filename)
 	}
 
 	if fd == INVALID_FILE_HANDLE {

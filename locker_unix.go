@@ -8,23 +8,25 @@ import (
 	"syscall"
 )
 
-type locker struct {
+type Locker struct {
 	nonblock bool
+	filename string
 	file     *os.File
 }
 
-func NewLocker(nonblock bool) *locker {
-	return &locker{
+func NewLocker(filename string, nonblock bool) *Locker {
+	return &Locker{
+		filename: filename,
 		nonblock: nonblock,
 	}
 }
 
-func (l *locker) Lock(fn string) error {
+func (l *Locker) Lock() error {
 	if l.file != nil {
 		return ErrFailedToAcquireLock
 	}
 
-	if fn == "" {
+	if l.filename == "" {
 		return ErrLockFileEmpty
 	}
 
@@ -35,9 +37,9 @@ func (l *locker) Lock(fn string) error {
 		flags = syscall.LOCK_EX
 	}
 
-	file, err := os.OpenFile(fn, syscall.O_RDONLY|syscall.O_NONBLOCK|syscall.O_APPEND|syscall.O_CREAT, 0600) // open append
+	file, err := os.OpenFile(l.filename, syscall.O_RDONLY|syscall.O_NONBLOCK|syscall.O_APPEND|syscall.O_CREAT, 0600) // open append
 	if err != nil {
-		return fmt.Errorf("setlock: fatal: unable to open %s: temporary failure", fn)
+		return fmt.Errorf("setlock: fatal: unable to open %s: temporary failure", l.filename)
 	}
 	defer func() {
 		if l.file == nil {
@@ -55,7 +57,7 @@ func (l *locker) Lock(fn string) error {
 	return nil
 }
 
-func (l *locker) Unlock() {
+func (l *Locker) Unlock() {
 	if l.file != nil {
 		l.file.Close()
 	}

@@ -35,8 +35,8 @@ func main() {
 
 	filePath := argv[0]
 
-	locker := setlock.NewLocker(flagndelay)
-	err := locker.Lock(filePath)
+	locker := setlock.NewLocker(filePath, flagndelay)
+	err := locker.Lock()
 	if err != nil {
 		if flagx {
 			os.Exit(0)
