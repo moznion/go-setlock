@@ -34,7 +34,7 @@ func main() {
 
 	filePath := argv[0]
 
-	locker := NewLocker(!flagndelay)
+	locker := NewLocker(flagndelay)
 	err := locker.lock(filePath)
 	if err != nil {
 		if flagx {
