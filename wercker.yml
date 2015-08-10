@@ -17,7 +17,7 @@ build:
         code: |
           prove t/
     - script:
-        name: goxc build & archive
+        name: goxc build -n setlock & archive
         code: |
           goxc -tasks='xc archive' -bc 'linux,!arm windows darwin' -d $WERCKER_OUTPUT_DIR/ -build-ldflags "-X main.Version \"$(git describe --tags --always --dirty) ($(git name-rev --name-only HEAD | sed 's/^remotes\/origin\///'))\"" -resources-include='README*'
     - script:
