@@ -7,7 +7,7 @@ Usage
 --
 
 ```
-setlock [ -nNxXv ] file program [ arg ... ]
+setlock [ -nNxXvV ] file program [ arg ... ]
 ```
 
 Features
