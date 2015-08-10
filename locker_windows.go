@@ -1,4 +1,4 @@
-package main
+package setlock
 
 import (
 	"fmt"
@@ -30,7 +30,7 @@ func NewLocker(nonblock bool) *locker {
 	}
 }
 
-func (l *locker) lock(lockfilename string) error {
+func (l *locker) Lock(lockfilename string) error {
 	if l.fd != INVALID_FILE_HANDLE {
 		return ErrFailedToAcquireLock
 	}
@@ -85,7 +85,7 @@ func (l *locker) lock(lockfilename string) error {
 	return nil
 }
 
-func (l *locker) release() {
+func (l *locker) Unlock() {
 	if fd := l.fd; fd != INVALID_FILE_HANDLE {
 		syscall.CloseHandle(fd)
 	}

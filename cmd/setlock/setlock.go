@@ -1,25 +1,26 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"os"
 	"os/exec"
+
+	"github.com/moznion/go-setlock"
 )
 
 const (
 	VERSION = "1.0.0"
 )
 
-var (
-	ErrFailedToAcquireLock = errors.New("unable to lock file: temporary failure")
-	ErrLockFileEmpty = errors.New("unable to open: filaname must not be empty")
-)
-
 func main() {
-	flagndelay, flagx, showVer := parseOpt()
+	flagndelay, flagx, showVer, showVerVerbose := parseOpt()
 	argv := flag.Args()
+
+	if showVerVerbose {
+		fmt.Printf("go-setlock (version: %s)\n", VERSION)
+		os.Exit(0)
+	}
 
 	if showVer {
 		fmt.Printf("%s\n", VERSION)
@@ -28,14 +29,14 @@ func main() {
 
 	if len(argv) < 2 {
 		// show usage
-		fmt.Fprintf(os.Stderr, "setlock: usage: go-setlock [ -nNxXv ] file program [ arg ... ]\n")
+		fmt.Fprintf(os.Stderr, "setlock: usage: setlock [ -nNxXv ] file program [ arg ... ]\n")
 		os.Exit(100)
 	}
 
 	filePath := argv[0]
 
-	locker := NewLocker(flagndelay)
-	err := locker.lock(filePath)
+	locker := setlock.NewLocker(flagndelay)
+	err := locker.Lock(filePath)
 	if err != nil {
 		if flagx {
 			os.Exit(0)
@@ -43,7 +44,7 @@ func main() {
 		fmt.Println(err)
 		os.Exit(111)
 	}
-	defer locker.release()
+	defer locker.Unlock()
 
 	cmd := exec.Command(argv[1])
 	for _, arg := range argv[2:] {
@@ -60,17 +61,18 @@ func main() {
 	}
 }
 
-func parseOpt() (bool, bool, bool) {
-	var n, N, x, X, showVer bool
+func parseOpt() (bool, bool, bool, bool) {
+	var n, N, x, X, showVer, showVerVerbose bool
 	flag.BoolVar(&n, "n", false, "No delay. If fn is locked by another process, setlock gives up.")
 	flag.BoolVar(&N, "N", false, "(Default.) Delay. If fn is locked by another process, setlock waits until it can obtain a new lock.")
 	flag.BoolVar(&x, "x", false, "If fn cannot be opened (or created) or locked, setlock exits zero.")
 	flag.BoolVar(&X, "X", false, "(Default.) If fn cannot be opened (or created) or locked, setlock prints an error message and exits nonzero.")
 	flag.BoolVar(&showVer, "v", false, "Show version.")
+	flag.BoolVar(&showVerVerbose, "V", false, "Show version verbosely.")
 	flag.Parse()
 
 	flagndelay := n && !N
 	flagx := x && !X
 
-	return flagndelay, flagx, showVer
+	return flagndelay, flagx, showVer, showVerVerbose
 }

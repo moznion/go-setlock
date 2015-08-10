@@ -4,11 +4,10 @@ use utf8;
 use FindBin;
 use Test::More;
 
-my $bin;
+my $bin = 'setlock';
 my $lockfile = "$FindBin::Bin/../setlockfile-test";
 BEGIN {
-    $bin = "setlock";
-    `go build -o $bin`;
+    `go build ./cmd/setlock/setlock.go`;
 }
 
 our @OPTS;
