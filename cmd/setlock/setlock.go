@@ -24,7 +24,7 @@ func main() {
 
 	if len(argv) < 2 {
 		// show usage
-		fmt.Fprintf(os.Stderr, "setlock: usage: go-setlock [ -nNxXv ] file program [ arg ... ]\n")
+		fmt.Fprintf(os.Stderr, "setlock: usage: setlock [ -nNxXv ] file program [ arg ... ]\n")
 		os.Exit(100)
 	}
 
