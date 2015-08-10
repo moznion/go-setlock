@@ -1,20 +1,16 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"os"
 	"os/exec"
+
+	"github.com/moznion/go-setlock"
 )
 
 const (
 	VERSION = "1.0.0"
-)
-
-var (
-	ErrFailedToAcquireLock = errors.New("unable to lock file: temporary failure")
-	ErrLockFileEmpty = errors.New("unable to open: filaname must not be empty")
 )
 
 func main() {
@@ -34,8 +30,8 @@ func main() {
 
 	filePath := argv[0]
 
-	locker := NewLocker(flagndelay)
-	err := locker.lock(filePath)
+	locker := setlock.NewLocker(flagndelay)
+	err := locker.Lock(filePath)
 	if err != nil {
 		if flagx {
 			os.Exit(0)
@@ -43,7 +39,7 @@ func main() {
 		fmt.Println(err)
 		os.Exit(111)
 	}
-	defer locker.release()
+	defer locker.Unlock()
 
 	cmd := exec.Command(argv[1])
 	for _, arg := range argv[2:] {

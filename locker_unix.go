@@ -1,6 +1,6 @@
 // +build !windows
 
-package main
+package setlock
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ func NewLocker(nonblock bool) *locker {
 	}
 }
 
-func (l *locker) lock(fn string) error {
+func (l *locker) Lock(fn string) error {
 	if l.file != nil {
 		return ErrFailedToAcquireLock
 	}
@@ -55,7 +55,7 @@ func (l *locker) lock(fn string) error {
 	return nil
 }
 
-func (l *locker) release() {
+func (l *locker) Unlock() {
 	if l.file != nil {
 		l.file.Close()
 	}
