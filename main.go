@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -9,6 +10,11 @@ import (
 
 const (
 	VERSION = "1.0.0"
+)
+
+var (
+	ErrFailedToAcquireLock = errors.New("unable to lock file: temporary failure")
+	ErrLockFileEmpty = errors.New("unable to open: filaname must not be empty")
 )
 
 func main() {
@@ -28,12 +34,7 @@ func main() {
 
 	filePath := argv[0]
 
-	var locker locker
-	if flagndelay {
-		locker = newLockerEXNB()
-	} else {
-		locker = newLockerEX()
-	}
+	locker := NewLocker(flagndelay)
 	err := locker.lock(filePath)
 	if err != nil {
 		if flagx {
@@ -42,6 +43,7 @@ func main() {
 		fmt.Println(err)
 		os.Exit(111)
 	}
+	defer locker.release()
 
 	cmd := exec.Command(argv[1])
 	for _, arg := range argv[2:] {
