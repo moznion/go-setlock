@@ -11,6 +11,14 @@ BEGIN {
     `go build -o $bin`;
 }
 
+our @OPTS;
+sub setlock {
+    unshift @_, $lockfile;
+    unshift @_, $_ for reverse @OPTS;
+    diag "$$ setlock: @_";
+    return system "./$bin @_";
+}
+
 subtest 'blocking' => sub {
     my $pid = fork;
     if (!defined $pid) {
@@ -19,7 +27,7 @@ subtest 'blocking' => sub {
 
     if ($pid == 0) {
         # child process
-        `./$bin $lockfile sleep 7`;
+        setlock(qw(sleep 7));
         exit;
     }
 
@@ -27,7 +35,7 @@ subtest 'blocking' => sub {
     sleep 1; # for preparing
 
     my $begin = time;
-    my $status = system "./$bin $lockfile echo hello";
+    my $status = setlock(qw(echo hello));
     my $end = time;
 
     is $status, 0, 'Execute command successfully';
@@ -42,13 +50,14 @@ subtest 'non-blocking' => sub {
 
     if ($pid == 0) {
         # child process
-        `./$bin $lockfile sleep 3`;
+        setlock(qw(sleep 3));
         exit;
     }
 
     # parent process
     sleep 1; # for preparing
-    my $status = system("./$bin -n $lockfile echo hello") >> 8;
+    local @OPTS = qw(-n);
+    my $status = setlock(qw(echo hello)) >> 8;
     is $status, 111, 'Execute command failed immediately';
 
     waitpid $pid, 0;
@@ -57,11 +66,11 @@ subtest 'non-blocking' => sub {
 
 subtest 'check status code' => sub {
     {
-        my $status = system("./$bin $lockfile") >> 8;
+        my $status = setlock() >> 8;
         is $status, 100;
     }
     {
-        my $status = system("./$bin $lockfile NOT_EXISTED_COMMAND_XXX") >> 8;
+        my $status = setlock("NOT_EXISTED_COMMAND_XXX") >> 8;
         is $status, 111;
     }
 };
@@ -76,7 +85,7 @@ subtest 'overwrite with negative option' => sub {
 
     if ($pid == 0) {
         # child process
-        `./$bin $lockfile sleep 5`;
+        setlock(qw(sleep 5));
         exit;
     }
 
@@ -84,7 +93,8 @@ subtest 'overwrite with negative option' => sub {
     sleep 1; # for preparing
 
     my $begin = time;
-    my $status = system "./$bin -n -N $lockfile echo hello"; # -N option overwrites
+    local @OPTS = qw(-n -N);
+    my $status = setlock(qw(echo hello)); # -N option overwrites
     my $end = time;
 
     is $status, 0, 'Execute command successfully';
