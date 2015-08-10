@@ -35,19 +35,19 @@ deploy:
         tag: $RELEASE_TAG
     - wercker/github-upload-asset:
         token: $GITHUB_TOKEN
-        file: snapshot/go-setlock_linux_386.tar.gz
+        file: snapshot/setlock_linux_386.tar.gz
     - wercker/github-upload-asset:
         token: $GITHUB_TOKEN
-        file: snapshot/go-setlock_linux_amd64.tar.gz
+        file: snapshot/setlock_linux_amd64.tar.gz
     - wercker/github-upload-asset:
         token: $GITHUB_TOKEN
-        file: snapshot/go-setlock_darwin_386.zip
+        file: snapshot/setlock_darwin_386.zip
     - wercker/github-upload-asset:
         token: $GITHUB_TOKEN
-        file: snapshot/go-setlock_darwin_amd64.zip
+        file: snapshot/setlock_darwin_amd64.zip
     - wercker/github-upload-asset:
         token: $GITHUB_TOKEN
-        file: snapshot/go-setlock_windows_386.zip
+        file: snapshot/setlock_windows_386.zip
     - wercker/github-upload-asset:
         token: $GITHUB_TOKEN
-        file: snapshot/go-setlock_windows_amd64.zip
+        file: snapshot/setlock_windows_amd64.zip
