@@ -3,10 +3,11 @@ package setlock
 import "errors"
 
 var (
-	ErrFailedToAcquireLock = errors.New("unable to lock file: temporary failure")
-	ErrLockFileEmpty       = errors.New("unable to open: filaname must not be empty")
+	errFailedToAcquireLock = errors.New("unable to lock file: temporary failure")
+	errLockFileEmpty       = errors.New("unable to open: filaname must not be empty")
 )
 
-type Locker interface {
+// A Setlocker represents an object that can be locked with error handling.
+type Setlocker interface {
 	LockWithErr() error
 }
