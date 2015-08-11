@@ -8,20 +8,26 @@ import (
 	"syscall"
 )
 
-type Locker struct {
+type locker struct {
 	nonblock bool
 	filename string
 	file     *os.File
 }
 
-func NewLocker(filename string, nonblock bool) *Locker {
-	return &Locker{
+func NewLocker(filename string, nonblock bool) *locker {
+	return &locker{
 		filename: filename,
 		nonblock: nonblock,
 	}
 }
 
-func (l *Locker) Lock() error {
+func (l *locker) Lock() {
+	if err := l.LockWithErr(); err != nil {
+		panic(err)
+	}
+}
+
+func (l *locker) LockWithErr() error {
 	if l.file != nil {
 		return ErrFailedToAcquireLock
 	}
@@ -57,7 +63,7 @@ func (l *Locker) Lock() error {
 	return nil
 }
 
-func (l *Locker) Unlock() {
+func (l *locker) Unlock() {
 	if l.file != nil {
 		l.file.Close()
 	}

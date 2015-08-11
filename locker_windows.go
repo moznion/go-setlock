@@ -32,7 +32,13 @@ func NewLocker(filename string, nonblock bool) *locker {
 	}
 }
 
-func (l *locker) Lock() error {
+func (l *locker) Lock() {
+	if err := LockWithErr(); err != nil {
+		panic(err)
+	}
+}
+
+func (l *locker) LockWithErr() error {
 	if l.fd != INVALID_FILE_HANDLE {
 		return ErrFailedToAcquireLock
 	}
