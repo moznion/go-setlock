@@ -15,6 +15,7 @@ build:
     - script:
         name: test
         code: |
+          go test
           prove t/
     - script:
         name: goxc build & archive

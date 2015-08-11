@@ -13,16 +13,26 @@ const (
 	VERSION = "1.1.0"
 )
 
-func main() {
-	flagndelay, flagx, showVer, showVerVerbose := parseOpt()
-	argv := flag.Args()
+type opt struct {
+	flagndelay     bool
+	flagx          bool
+	showVer        bool
+	showVerVerbose bool
+}
 
-	if showVerVerbose {
+func main() {
+	o := parseOpt()
+	argv := flag.Args()
+	run(o, argv...)
+}
+
+func run(o *opt, argv ...string) {
+	if o.showVerVerbose {
 		fmt.Printf("go-setlock (version: %s)\n", VERSION)
 		os.Exit(0)
 	}
 
-	if showVer {
+	if o.showVer {
 		fmt.Printf("%s\n", VERSION)
 		os.Exit(0)
 	}
@@ -35,10 +45,10 @@ func main() {
 
 	filePath := argv[0]
 
-	locker := setlock.NewLocker(filePath, flagndelay)
+	locker := setlock.NewLocker(filePath, o.flagndelay)
 	err := locker.LockWithErr()
 	if err != nil {
-		if flagx {
+		if o.flagx {
 			os.Exit(0)
 		}
 		fmt.Println(err)
@@ -61,7 +71,7 @@ func main() {
 	}
 }
 
-func parseOpt() (bool, bool, bool, bool) {
+func parseOpt() *opt {
 	var n, N, x, X, showVer, showVerVerbose bool
 	flag.BoolVar(&n, "n", false, "No delay. If fn is locked by another process, setlock gives up.")
 	flag.BoolVar(&N, "N", false, "(Default.) Delay. If fn is locked by another process, setlock waits until it can obtain a new lock.")
@@ -71,8 +81,10 @@ func parseOpt() (bool, bool, bool, bool) {
 	flag.BoolVar(&showVerVerbose, "V", false, "Show version verbosely.")
 	flag.Parse()
 
-	flagndelay := n && !N
-	flagx := x && !X
-
-	return flagndelay, flagx, showVer, showVerVerbose
+	return &opt{
+		flagndelay:     n && !N,
+		flagx:          x && !X,
+		showVer:        showVer,
+		showVerVerbose: showVerVerbose,
+	}
 }
