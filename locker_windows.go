@@ -52,7 +52,7 @@ func NewLocker(filename string, nonblock bool) *Locker {
 // Non-blocking mode makes panic immediately if it cannot obtain a lock (means it doesn't wait).
 // Please use LockWithErr().
 func (l *Locker) Lock() {
-	if err := LockWithErr(); err != nil {
+	if err := l.LockWithErr(); err != nil {
 		panic(err)
 	}
 }
