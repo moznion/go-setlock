@@ -10,22 +10,9 @@ const (
 	lockfile = "setlockfile-test"
 )
 
-func TestMain(m *testing.M) {
-	setup()
-	code := m.Run()
-	teardown()
-	os.Exit(code)
-}
-
-func setup() {
-	os.Remove(lockfile)
-}
-
-func teardown() {
-	os.Remove(lockfile)
-}
-
 func TestLockWithBlocking(t *testing.T) {
+	defer os.Remove(lockfile)
+
 	go func() {
 		locker := NewLocker(lockfile, false)
 		locker.Lock()
@@ -50,6 +37,8 @@ func TestLockWithBlocking(t *testing.T) {
 }
 
 func TestLockWithNonBlocking(t *testing.T) {
+	defer os.Remove(lockfile)
+
 	go func() {
 		locker := NewLocker(lockfile, false)
 		locker.Lock()
@@ -75,6 +64,8 @@ func TestLockWithNonBlocking(t *testing.T) {
 }
 
 func TestLockWithErrWithBlocking(t *testing.T) {
+	defer os.Remove(lockfile)
+
 	go func() {
 		locker := NewLocker(lockfile, false)
 		locker.LockWithErr()
@@ -99,6 +90,8 @@ func TestLockWithErrWithBlocking(t *testing.T) {
 }
 
 func TestLockWithErrWithNonBlocking(t *testing.T) {
+	defer os.Remove(lockfile)
+
 	go func() {
 		locker := NewLocker(lockfile, false)
 		locker.LockWithErr()
