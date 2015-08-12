@@ -6,23 +6,49 @@ go-setlock
 [![Go Documentation](http://img.shields.io/badge/go-documentation-blue.svg)](http://godoc.org/github.com/moznion/go-setlock)
 [![GitHub release](http://img.shields.io/github/release/moznion/go-setlock.svg)](https://github.com/moznion/go-setlock/releases)
 
-Go port of [setlock](http://cr.yp.to/daemontools/setlock.html) (an utility of daemontools)
+go-setlock is a go port of [setlock](http://cr.yp.to/daemontools/setlock.html) (an utility of daemontools),
+and accompanying library.
 
-Usage
+Command Usage
 --
 
 ```
 setlock [ -nNxXvV ] file program [ arg ... ]
 ```
 
-Features
+Command Features
 --
 
 - Functions of original setlock (See: [http://cr.yp.to/daemontools/setlock.html](http://cr.yp.to/daemontools/setlock.html))
-- Windows support
+- Support multiple environments
+    - Linux
+    - OS X
+    - Windows
+
+Command Installation
+--
+
+- Download built archive from [GitHub Releases](https://github.com/moznion/go-setlock/releases) and extract it
+- Or install by `go get` command: `go get github.com/moznion/go-setlock/cmd/setlock`
+
+Library Usage
+--
+
+go-setlock provides file based exclusive lock functions by `setlock` package.  
+Please refer to the godoc: [![Go Documentation](http://img.shields.io/badge/go-documentation-blue.svg)](http://godoc.org/github.com/moznion/go-setlock)
+
+Author
+--
+
+moznion (<moznion@gmail.com>)
+
+Contributor
+--
+
+lestrrat
 
 License
 --
 
-MIT
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/moznion/go-setlock/blob/master/LICENSE)
 
