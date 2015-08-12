@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	VERSION = "1.1.0"
+	version = "1.1.0"
 )
 
 type opt struct {
@@ -28,12 +28,12 @@ func main() {
 
 func run(o *opt, argv ...string) {
 	if o.showVerVerbose {
-		fmt.Printf("go-setlock (version: %s)\n", VERSION)
+		fmt.Printf("go-setlock (version: %s)\n", version)
 		os.Exit(0)
 	}
 
 	if o.showVer {
-		fmt.Printf("%s\n", VERSION)
+		fmt.Printf("%s\n", version)
 		os.Exit(0)
 	}
 

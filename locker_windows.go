@@ -63,7 +63,7 @@ func (l *Locker) Lock() {
 // Else if you use with non-blocking mode, Lock doesn't wait to obtain a lock (means Lock makes failure immediately if cannot obtain a lock).
 func (l *Locker) LockWithErr() error {
 	if l.fd != invalidFileHandle {
-		return errFailedToAcquireLock
+		return ErrFailedToAcquireLock
 	}
 
 	var flags uint32
@@ -74,7 +74,7 @@ func (l *Locker) LockWithErr() error {
 	}
 
 	if l.filename == "" {
-		return errLockFileEmpty
+		return ErrLockFileEmpty
 	}
 	fd, err := syscall.CreateFile(&(syscall.StringToUTF16(l.filename)[0]), syscall.GENERIC_READ|syscall.GENERIC_WRITE,
 		syscall.FILE_SHARE_READ|syscall.FILE_SHARE_WRITE, nil, syscall.OPEN_ALWAYS, syscall.FILE_ATTRIBUTE_NORMAL, 0)
@@ -83,7 +83,7 @@ func (l *Locker) LockWithErr() error {
 	}
 
 	if fd == invalidFileHandle {
-		return errFailedToAcquireLock
+		return ErrFailedToAcquireLock
 	}
 	defer func() {
 		// Close this descriptor if we failed to lock
@@ -109,7 +109,7 @@ func (l *Locker) LockWithErr() error {
 		uintptr(unsafe.Pointer(&ol)),
 	)
 	if r1 == 0 {
-		return errFailedToAcquireLock
+		return ErrFailedToAcquireLock
 	}
 
 	l.fd = fd

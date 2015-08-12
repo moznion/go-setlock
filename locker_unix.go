@@ -52,11 +52,11 @@ func (l *Locker) Lock() {
 // Else if you use with non-blocking mode, Lock doesn't wait to obtain a lock (means Lock makes failure immediately if cannot obtain a lock).
 func (l *Locker) LockWithErr() error {
 	if l.file != nil {
-		return errFailedToAcquireLock
+		return ErrFailedToAcquireLock
 	}
 
 	if l.filename == "" {
-		return errLockFileEmpty
+		return ErrLockFileEmpty
 	}
 
 	var flags int
@@ -79,7 +79,7 @@ func (l *Locker) LockWithErr() error {
 
 	err = syscall.Flock(int(file.Fd()), flags)
 	if err != nil {
-		return errFailedToAcquireLock
+		return ErrFailedToAcquireLock
 	}
 
 	l.file = file
