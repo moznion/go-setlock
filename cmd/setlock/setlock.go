@@ -61,6 +61,7 @@ func run(o *opt, argv ...string) {
 		cmd.Args = append(cmd.Args, arg)
 	}
 
+	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
