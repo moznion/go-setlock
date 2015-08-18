@@ -13,7 +13,12 @@ const (
 func TestLockWithBlocking(t *testing.T) {
 	defer os.Remove(lockfile)
 
+	done := make(chan bool)
+
 	go func() {
+		defer func() {
+			done <- true
+		}()
 		locker := NewLocker(lockfile, false)
 		locker.Lock()
 		defer locker.Unlock()
@@ -34,12 +39,19 @@ func TestLockWithBlocking(t *testing.T) {
 	if end-begin < 3 { // XXX
 		t.Error("(Maybe) Lock is not blocking")
 	}
+
+	<-done
 }
 
 func TestLockWithNonBlocking(t *testing.T) {
 	defer os.Remove(lockfile)
 
+	done := make(chan bool)
+
 	go func() {
+		defer func() {
+			done <- true
+		}()
 		locker := NewLocker(lockfile, false)
 		locker.Lock()
 		defer locker.Unlock()
@@ -61,12 +73,19 @@ func TestLockWithNonBlocking(t *testing.T) {
 	locker := NewLocker(lockfile, true)
 	locker.Lock()
 	defer locker.Unlock()
+
+	<-done
 }
 
 func TestLockWithErrWithBlocking(t *testing.T) {
 	defer os.Remove(lockfile)
 
+	done := make(chan bool)
+
 	go func() {
+		defer func() {
+			done <- true
+		}()
 		locker := NewLocker(lockfile, false)
 		locker.LockWithErr()
 		defer locker.Unlock()
@@ -87,12 +106,19 @@ func TestLockWithErrWithBlocking(t *testing.T) {
 	if end-begin < 3 { // XXX
 		t.Error("(Maybe) Lock is not blocking")
 	}
+
+	<-done
 }
 
 func TestLockWithErrWithNonBlocking(t *testing.T) {
 	defer os.Remove(lockfile)
 
+	done := make(chan bool)
+
 	go func() {
+		defer func() {
+			done <- true
+		}()
 		locker := NewLocker(lockfile, false)
 		locker.LockWithErr()
 		defer locker.Unlock()
@@ -108,4 +134,6 @@ func TestLockWithErrWithNonBlocking(t *testing.T) {
 		t.Error("Not non-blocking")
 		return
 	}
+
+	<-done
 }
