@@ -66,7 +66,7 @@ func (l *Locker) LockWithErr() error {
 		flags = syscall.LOCK_EX
 	}
 
-	file, err := os.OpenFile(l.filename, syscall.O_RDONLY|syscall.O_NONBLOCK|syscall.O_APPEND|syscall.O_CREAT, 0600) // open append
+	file, err := os.OpenFile(l.filename, syscall.O_RDWR|syscall.O_NONBLOCK|syscall.O_APPEND|syscall.O_CREAT, 0600) // open append
 	if err != nil {
 		return fmt.Errorf("setlock: fatal: unable to open %s: temporary failure", l.filename)
 	}
