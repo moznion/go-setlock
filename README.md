@@ -45,7 +45,8 @@ moznion (<moznion@gmail.com>)
 Contributor
 --
 
-lestrrat
+* lestrrat
+* mattn
 
 License
 --
